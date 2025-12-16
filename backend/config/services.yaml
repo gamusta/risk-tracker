@@ -28,6 +28,9 @@ services:
     App\Risk\Domain\Repository\RiskRepositoryInterface:
         class: App\Risk\Infrastructure\Persistence\DoctrineRiskRepository
 
+    App\Risk\Domain\Repository\RiskHistoryRepositoryInterface:
+        class: App\Risk\Infrastructure\Persistence\DoctrineRiskHistoryRepository
+
     # Risk Feature - Score Calculator (Strategy Pattern)
     App\Risk\Domain\Service\ScoreCalculatorInterface:
         class: App\Risk\Infrastructure\Service\SimpleScoreCalculator

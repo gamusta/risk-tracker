@@ -40,17 +40,17 @@ final class RiskScore
 
     public function isCritical(): bool
     {
-        return $this->value >= 20;
+        return $this->value >= 25;  // Only 5×5
     }
 
     public function isHigh(): bool
     {
-        return $this->value >= 15 && $this->value < 20;
+        return $this->value >= 16 && $this->value < 25;
     }
 
     public function isMedium(): bool
     {
-        return $this->value >= 8 && $this->value < 15;
+        return $this->value >= 8 && $this->value < 16;
     }
 
     public function isLow(): bool

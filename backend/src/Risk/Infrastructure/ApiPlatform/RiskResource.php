@@ -12,7 +12,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Risk\Infrastructure\ApiPlatform\State\RiskProvider;
 use App\Risk\Infrastructure\ApiPlatform\State\RiskProcessor;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**

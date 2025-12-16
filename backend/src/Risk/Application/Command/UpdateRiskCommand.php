@@ -13,7 +13,9 @@ final readonly class UpdateRiskCommand
         public int $id,
         public string $title,
         public string $type,
-        public ?string $description = null
+        public ?string $description = null,
+        public ?int $severity = null,
+        public ?int $probability = null
     ) {
     }
 }

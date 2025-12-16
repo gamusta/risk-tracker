@@ -16,6 +16,7 @@ use App\Risk\Domain\Repository\RiskRepositoryInterface;
 use App\Risk\Domain\ValueObject\RiskStatus;
 use App\Risk\Infrastructure\ApiPlatform\RiskResource;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * State Processor: Handle POST/PUT/DELETE via Handlers
@@ -67,7 +68,9 @@ final readonly class RiskProcessor implements ProcessorInterface
                 id: $uriVariables['id'],
                 title: $data->title,
                 type: $data->type,
-                description: $data->description
+                description: $data->description,
+                severity: $data->severity,
+                probability: $data->probability
             );
 
             $risk = ($this->updateRiskHandler)($command);
@@ -76,13 +79,17 @@ final readonly class RiskProcessor implements ProcessorInterface
 
         // PATCH /risks/{id}/status (State Pattern)
         if ($operation instanceof \ApiPlatform\Metadata\Patch) {
-            $command = new ChangeRiskStatusCommand(
-                riskId: $uriVariables['id'],
-                newStatus: RiskStatus::from($data->status)
-            );
+            try {
+                $command = new ChangeRiskStatusCommand(
+                    riskId: $uriVariables['id'],
+                    newStatus: RiskStatus::from($data->status)
+                );
 
-            ($this->changeRiskStatusHandler)($command);
-            return $this->riskProvider->provide($operation, ['id' => $uriVariables['id']], $context);
+                ($this->changeRiskStatusHandler)($command);
+                return $this->riskProvider->provide($operation, ['id' => $uriVariables['id']], $context);
+            } catch (\InvalidArgumentException $e) {
+                throw new UnprocessableEntityHttpException($e->getMessage(), $e);
+            }
         }
 
         return null;

@@ -6,6 +6,8 @@ namespace App\Risk\Application\Command;
 
 use App\Risk\Domain\Entity\Risk;
 use App\Risk\Domain\Repository\RiskRepositoryInterface;
+use App\Risk\Domain\ValueObject\Severity;
+use App\Risk\Domain\ValueObject\Probability;
 use InvalidArgumentException;
 
 /**
@@ -31,6 +33,14 @@ final readonly class UpdateRiskHandler
             type: $command->type,
             description: $command->description
         );
+
+        // Si severity/probability fournis, réassessment
+        if ($command->severity !== null && $command->probability !== null) {
+            $risk->assess(
+                Severity::fromInt($command->severity),
+                Probability::fromInt($command->probability)
+            );
+        }
 
         $this->riskRepository->save($risk);
 

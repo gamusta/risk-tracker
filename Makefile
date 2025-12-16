@@ -1,4 +1,4 @@
-.PHONY: install start stop test db-reset logs
+.PHONY: install start stop test test-unit test-functional test-all test-coverage db-reset db-reset-test logs
 
 install:
 	docker compose build
@@ -11,14 +11,51 @@ start:
 stop:
 	docker compose down
 
-test:
-	docker compose exec php bin/phpunit
-	docker compose exec php vendor/bin/phpstan analyse src --level=5
+# Tests unitaires uniquement
+test-unit:
+	php bin/phpunit tests/Unit/
 
+# Tests fonctionnels uniquement
+test-functional:
+	php bin/console doctrine:database:drop --env=test --force --if-exists
+	php bin/console doctrine:database:create --env=test
+	php bin/console doctrine:migrations:migrate --env=test -n
+	php bin/phpunit tests/Functional/
+
+# Tous les tests
+test-all: test-unit test-functional
+
+# Tests avec coverage
+test-coverage:
+	XDEBUG_MODE=coverage php bin/phpunit --coverage-html coverage/
+
+# Analyse statique + tests
+test:
+	@echo "→ Tests unitaires..."
+	php bin/phpunit tests/Unit/
+	@echo "\n→ Tests fonctionnels..."
+	php bin/console doctrine:database:drop --env=test --force --if-exists
+	php bin/console doctrine:database:create --env=test
+	php bin/console doctrine:migrations:migrate --env=test -n
+	php bin/phpunit tests/Functional/
+	@echo "\n→ Analyse statique..."
+	php vendor/bin/phpstan analyse src --level=5
+
+# Reset DB dev
 db-reset:
-	docker compose exec php bin/console doctrine:database:drop --force --if-exists
-	docker compose exec php bin/console doctrine:database:create
-	docker compose exec php bin/console doctrine:migrations:migrate -n
+	php bin/console doctrine:database:drop --force --if-exists
+	php bin/console doctrine:database:create
+	php bin/console doctrine:migrations:migrate -n
+
+# Reset DB test
+db-reset-test:
+	php bin/console doctrine:database:drop --env=test --force --if-exists
+	php bin/console doctrine:database:create --env=test
+	php bin/console doctrine:migrations:migrate --env=test -n
+
+# Fixtures (si installées)
+db-fixtures:
+	php bin/console doctrine:fixtures:load -n
 
 logs:
 	docker compose logs -f
