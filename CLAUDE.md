@@ -65,30 +65,86 @@ Application complète démontrant maîtrise patterns architecture, API REST mode
 
 ## Architecture Globale
 
+### Structure Feature-Based + DDD
+
 ```
 risk-tracker/
 ├── backend/                   # API Symfony
 │   ├── config/
 │   ├── src/
-│   │   ├── Entity/           # Risk, Site, User, Category, RiskHistory
-│   │   ├── Repository/
-│   │   ├── Service/          # RiskService, ScoreCalculator, WorkflowManager
-│   │   ├── State/            # RiskStateMachine, States (Draft, Open, Assessed...)
-│   │   ├── Strategy/         # ScoreStrategy (Simple, Matrix, Advanced)
-│   │   ├── Factory/          # ReportFactory, NotificationFactory
-│   │   ├── EventListener/    # RiskStatusChangedListener
-│   │   ├── DTO/              # RiskDTO, SiteDTO
-│   │   └── Controller/       # API REST endpoints
+│   │   ├── Risk/             # Feature Risk
+│   │   │   ├── Domain/
+│   │   │   │   ├── Entity/Risk.php
+│   │   │   │   ├── ValueObject/
+│   │   │   │   │   ├── RiskStatus.php
+│   │   │   │   │   ├── RiskScore.php
+│   │   │   │   │   ├── Severity.php
+│   │   │   │   │   └── Probability.php
+│   │   │   │   ├── Repository/RiskRepositoryInterface.php
+│   │   │   │   ├── Service/ScoreCalculatorInterface.php
+│   │   │   │   └── Event/RiskStatusChanged.php
+│   │   │   ├── Application/
+│   │   │   │   ├── Command/
+│   │   │   │   │   ├── CreateRiskCommand.php
+│   │   │   │   │   ├── CreateRiskHandler.php
+│   │   │   │   │   ├── UpdateRiskStatusCommand.php
+│   │   │   │   │   └── UpdateRiskStatusHandler.php
+│   │   │   │   └── Query/
+│   │   │   │       ├── GetRiskQuery.php
+│   │   │   │       └── GetRiskHandler.php
+│   │   │   └── Infrastructure/
+│   │   │       ├── Persistence/DoctrineRiskRepository.php
+│   │   │       ├── ApiPlatform/RiskResource.php
+│   │   │       └── Service/
+│   │   │           ├── SimpleScoreCalculator.php (Strategy)
+│   │   │           ├── MatrixScoreCalculator.php (Strategy)
+│   │   │           └── AdvancedScoreCalculator.php (Strategy)
+│   │   │
+│   │   ├── Site/             # Feature Site
+│   │   │   ├── Domain/
+│   │   │   │   ├── Entity/Site.php
+│   │   │   │   └── Repository/SiteRepositoryInterface.php
+│   │   │   ├── Application/
+│   │   │   │   ├── Command/...
+│   │   │   │   └── Query/...
+│   │   │   └── Infrastructure/
+│   │   │       ├── Persistence/DoctrineSiteRepository.php
+│   │   │       └── ApiPlatform/SiteResource.php
+│   │   │
+│   │   ├── User/             # Feature User
+│   │   │   ├── Domain/
+│   │   │   │   ├── Entity/User.php
+│   │   │   │   ├── ValueObject/Role.php
+│   │   │   │   └── Repository/UserRepositoryInterface.php
+│   │   │   ├── Application/...
+│   │   │   └── Infrastructure/...
+│   │   │
+│   │   ├── Shared/           # Code partagé
+│   │   │   ├── Domain/
+│   │   │   │   └── ValueObject/Email.php
+│   │   │   └── Infrastructure/...
+│   │   │
+│   │   └── Kernel.php
 │   ├── tests/
+│   │   ├── Unit/             # Tests unitaires (Domain/Application)
+│   │   ├── Integration/      # Tests intégration (Infrastructure)
+│   │   └── Functional/       # Tests E2E API
 │   ├── docker/
 │   └── composer.json
 │
 ├── frontend/                  # App Vue.js
 │   ├── src/
-│   │   ├── components/       # RiskList, RiskForm, RiskCard, SiteSelector
-│   │   ├── composables/      # useRisks, useAuth, useWorkflow
-│   │   ├── stores/           # riskStore, authStore, siteStore (Pinia)
-│   │   ├── views/            # DashboardView, RisksView, SitesView
+│   │   ├── features/         # Organisation par feature
+│   │   │   ├── risk/
+│   │   │   │   ├── components/
+│   │   │   │   ├── composables/
+│   │   │   │   ├── stores/
+│   │   │   │   └── views/
+│   │   │   ├── site/
+│   │   │   └── user/
+│   │   ├── shared/
+│   │   │   ├── components/
+│   │   │   └── composables/
 │   │   ├── services/         # api.service.ts
 │   │   └── router/
 │   ├── package.json
@@ -98,6 +154,18 @@ risk-tracker/
 ├── Makefile
 └── README.md
 ```
+
+### Principes Architecture
+
+**Feature-Based Structure**
+- Chaque feature (Risk/Site/User) isolée
+- Cohésion forte intra-feature
+- Couplage faible inter-features
+
+**DDD Layers par Feature**
+- **Domain**: Logique métier pure, indépendante framework
+- **Application**: Use cases (Commands/Queries), orchestration
+- **Infrastructure**: Implémentation technique (Doctrine, API Platform)
 
 ---
 
@@ -184,10 +252,12 @@ risk-tracker/
 ## Contraintes Qualité
 
 ### Code
+- **DDD** (Domain-Driven Design): Logique métier isolée du framework
+- **TDD** (Test-Driven Development): Tests avant implémentation
+- **SOLID**: Principes conception orientée objet
+- **Clean Code**: Nommage explicite, fonctions courtes, commentaires pertinents
 - PSR-12 (PHP)
 - Strict types PHP/TypeScript
-- SOLID principles
-- Clean Code
 
 ### Tests
 - PHPUnit coverage >70%

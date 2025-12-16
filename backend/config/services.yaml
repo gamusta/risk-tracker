@@ -17,8 +17,25 @@ services:
         resource: '../src/'
         exclude:
             - '../src/DependencyInjection/'
-            - '../src/Entity/'
+            - '../src/*/Domain/Entity/'
+            - '../src/*/Domain/ValueObject/'
+            - '../src/*/Domain/Event/'
             - '../src/Kernel.php'
 
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
+    # DDD: Bind Domain interfaces to Infrastructure implementations
+
+    # Risk Feature - Repository
+    App\Risk\Domain\Repository\RiskRepositoryInterface:
+        class: App\Risk\Infrastructure\Persistence\DoctrineRiskRepository
+
+    # Risk Feature - Score Calculator (Strategy Pattern)
+    App\Risk\Domain\Service\ScoreCalculatorInterface:
+        class: App\Risk\Infrastructure\Service\SimpleScoreCalculator
+
+    # Site Feature - Repository
+    App\Site\Domain\Repository\SiteRepositoryInterface:
+        class: App\Site\Infrastructure\Persistence\DoctrineSiteRepository
+
+    # User Feature - Repository
+    App\User\Domain\Repository\UserRepositoryInterface:
+        class: App\User\Infrastructure\Persistence\DoctrineUserRepository
