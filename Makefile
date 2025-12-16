@@ -45,7 +45,7 @@ test:
 	$(CONSOLE) doctrine:migrations:migrate --env=test -n
 	$(PHPUNIT) tests/Functional/
 	@echo "\n→ Analyse statique..."
-	$(PHP) vendor/bin/phpstan analyse src --level=5
+	$(PHP) vendor/bin/phpstan analyse --memory-limit=256M
 
 # Reset DB dev
 db-reset:

@@ -12,6 +12,7 @@ use App\Risk\Infrastructure\ApiPlatform\RiskResource;
 
 /**
  * State Provider: Transform Domain Entity → API Resource
+ * @implements ProviderInterface<RiskResource>
  */
 final readonly class RiskProvider implements ProviderInterface
 {

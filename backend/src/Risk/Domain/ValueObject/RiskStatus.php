@@ -19,6 +19,7 @@ enum RiskStatus: string
 
     /**
      * Transitions autorisées par statut (State Pattern)
+     * @return self[]
      */
     public function allowedTransitions(): array
     {

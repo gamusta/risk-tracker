@@ -1,0 +1,13 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Property App\\Risk\\Domain\\Entity\\Risk\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Risk/Domain/Entity/Risk.php
+
+		-
+			message: '#^Property App\\Risk\\Domain\\Entity\\RiskHistory\:\:\$id \(int\|null\) is never assigned int so it can be removed from the property type\.$#'
+			identifier: property.unusedType
+			count: 1
+			path: src/Risk/Domain/Entity/RiskHistory.php

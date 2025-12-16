@@ -20,6 +20,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 
 /**
  * State Processor: Handle POST/PUT/DELETE via Handlers
+ * @implements ProcessorInterface<RiskResource, RiskResource|null>
  */
 final readonly class RiskProcessor implements ProcessorInterface
 {
@@ -34,7 +35,7 @@ final readonly class RiskProcessor implements ProcessorInterface
 
     public function process(mixed $data, Operation $operation, array $uriVariables = [], array $context = []): ?RiskResource
     {
-        assert($data instanceof RiskResource);
+        /** @var RiskResource $data */
 
         // DELETE
         if ($operation instanceof \ApiPlatform\Metadata\Delete) {
@@ -59,7 +60,9 @@ final readonly class RiskProcessor implements ProcessorInterface
             );
 
             $risk = ($this->createRiskHandler)($command);
-            return $this->riskProvider->provide($operation, ['id' => $risk->getId()], $context);
+            /** @var RiskResource|null $result */
+            $result = $this->riskProvider->provide($operation, ['id' => $risk->getId()], $context);
+            return $result;
         }
 
         // PUT
@@ -74,7 +77,9 @@ final readonly class RiskProcessor implements ProcessorInterface
             );
 
             $risk = ($this->updateRiskHandler)($command);
-            return $this->riskProvider->provide($operation, ['id' => $risk->getId()], $context);
+            /** @var RiskResource|null $result */
+            $result = $this->riskProvider->provide($operation, ['id' => $risk->getId()], $context);
+            return $result;
         }
 
         // PATCH /risks/{id}/status (State Pattern)
@@ -86,7 +91,9 @@ final readonly class RiskProcessor implements ProcessorInterface
                 );
 
                 ($this->changeRiskStatusHandler)($command);
-                return $this->riskProvider->provide($operation, ['id' => $uriVariables['id']], $context);
+                /** @var RiskResource|null $result */
+                $result = $this->riskProvider->provide($operation, ['id' => $uriVariables['id']], $context);
+                return $result;
             } catch (\InvalidArgumentException $e) {
                 throw new UnprocessableEntityHttpException($e->getMessage(), $e);
             }

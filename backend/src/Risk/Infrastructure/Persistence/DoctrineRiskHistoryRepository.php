@@ -11,6 +11,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 /**
  * Repository: Doctrine implementation RiskHistory
+ * @extends ServiceEntityRepository<RiskHistory>
  */
 class DoctrineRiskHistoryRepository extends ServiceEntityRepository implements RiskHistoryRepositoryInterface
 {
@@ -25,6 +26,7 @@ class DoctrineRiskHistoryRepository extends ServiceEntityRepository implements R
         $this->getEntityManager()->flush();
     }
 
+    /** @return RiskHistory[] */
     public function findByRiskId(int $riskId): array
     {
         return $this->createQueryBuilder('h')
@@ -35,6 +37,7 @@ class DoctrineRiskHistoryRepository extends ServiceEntityRepository implements R
             ->getResult();
     }
 
+    /** @return RiskHistory[] */
     public function findAll(): array
     {
         return $this->createQueryBuilder('h')

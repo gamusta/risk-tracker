@@ -28,6 +28,7 @@ class RiskHistory
     #[ORM\Column(type: 'string', length: 50)]
     private string $action;  // created, updated, status_changed, assessed, closed
 
+    /** @var array<string, mixed>|null */
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $changes = null;  // Old/new values
 
@@ -37,6 +38,9 @@ class RiskHistory
     #[ORM\Column(type: 'datetime_immutable')]
     private DateTimeImmutable $createdAt;
 
+    /**
+     * @param array<string, mixed>|null $changes
+     */
     private function __construct(
         int $riskId,
         string $action,
@@ -50,6 +54,9 @@ class RiskHistory
         $this->createdAt = new DateTimeImmutable();
     }
 
+    /**
+     * @param array<string, mixed>|null $changes
+     */
     public static function record(
         int $riskId,
         string $action,
@@ -74,6 +81,9 @@ class RiskHistory
         return $this->action;
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getChanges(): ?array
     {
         return $this->changes;

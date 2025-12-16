@@ -38,8 +38,13 @@ final readonly class ChangeRiskStatusHandler
         $this->riskRepository->save($risk);
 
         // Event Observer Pattern
+        $riskId = $risk->getId();
+        if ($riskId === null) {
+            throw new \RuntimeException('Risk ID cannot be null after save');
+        }
+
         $event = new RiskStatusChanged(
-            riskId: $risk->getId(),
+            riskId: $riskId,
             oldStatus: $oldStatus,
             newStatus: $command->newStatus,
             occurredAt: new \DateTimeImmutable()

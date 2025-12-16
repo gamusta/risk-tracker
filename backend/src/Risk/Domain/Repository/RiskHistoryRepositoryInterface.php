@@ -13,6 +13,7 @@ interface RiskHistoryRepositoryInterface
 {
     public function save(RiskHistory $history): void;
 
+    /** @return RiskHistory[] */
     public function findByRiskId(int $riskId): array;
 
     /** @return RiskHistory[] */
