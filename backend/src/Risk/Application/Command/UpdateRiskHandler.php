@@ -24,7 +24,7 @@ final readonly class UpdateRiskHandler
     {
         $risk = $this->riskRepository->findById($command->id);
 
-        if (!$risk) {
+        if (! $risk) {
             throw new InvalidArgumentException(sprintf('Risk with ID %d not found', $command->id));
         }
 

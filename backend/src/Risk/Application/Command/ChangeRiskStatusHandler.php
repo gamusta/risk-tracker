@@ -24,7 +24,7 @@ final readonly class ChangeRiskStatusHandler
     {
         $risk = $this->riskRepository->findById($command->riskId);
 
-        if (!$risk) {
+        if (! $risk) {
             throw new InvalidArgumentException(
                 sprintf('Risk with ID %d not found', $command->riskId)
             );

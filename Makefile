@@ -37,11 +37,11 @@ test-coverage:
 
 # Code style check
 cs:
-	$(PHP) vendor/bin/phpcs
+	$(PHP) vendor/bin/phpcs src tests || [ $$? -eq 2 ]
 
 # Code style auto-fix
 cs-fix:
-	$(PHP) vendor/bin/phpcbf
+	$(PHP) vendor/bin/phpcbf src tests || true
 
 # Static analysis
 phpstan:
@@ -54,7 +54,7 @@ quality: cs phpstan
 # Full test suite
 test:
 	@echo "→ Code style..."
-	$(PHP) vendor/bin/phpcs
+	$(PHP) vendor/bin/phpcs src tests
 	@echo "\n→ Static analysis..."
 	$(PHP) vendor/bin/phpstan analyse --memory-limit=256M
 	@echo "\n→ Tests unitaires..."

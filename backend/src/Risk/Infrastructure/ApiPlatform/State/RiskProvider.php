@@ -32,7 +32,7 @@ final readonly class RiskProvider implements ProviderInterface
         // Get single
         $risk = $this->riskRepository->findById($uriVariables['id']);
 
-        if (!$risk) {
+        if (! $risk) {
             return null;
         }
 

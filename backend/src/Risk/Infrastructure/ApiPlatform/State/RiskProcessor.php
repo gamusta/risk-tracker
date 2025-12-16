@@ -40,7 +40,7 @@ final readonly class RiskProcessor implements ProcessorInterface
         // DELETE
         if ($operation instanceof \ApiPlatform\Metadata\Delete) {
             $risk = $this->riskRepository->findById($uriVariables['id']);
-            if (!$risk) {
+            if (! $risk) {
                 throw new NotFoundHttpException('Risk not found');
             }
             $this->riskRepository->delete($risk);

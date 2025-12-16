@@ -93,7 +93,7 @@ class Risk
     {
         $currentStatus = RiskStatus::from($this->status);
 
-        if (!$currentStatus->canTransitionTo($newStatus)) {
+        if (! $currentStatus->canTransitionTo($newStatus)) {
             throw new InvalidArgumentException(
                 sprintf('Cannot transition from %s to %s', $currentStatus->value, $newStatus->value)
             );
@@ -222,7 +222,7 @@ class Risk
     {
         $allowedTypes = ['security', 'environment', 'social', 'cyber'];
 
-        if (!in_array($type, $allowedTypes, true)) {
+        if (! in_array($type, $allowedTypes, true)) {
             throw new InvalidArgumentException(
                 sprintf('Type must be one of: %s', implode(', ', $allowedTypes))
             );
