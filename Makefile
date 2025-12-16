@@ -1,4 +1,4 @@
-.PHONY: install start stop test test-unit test-functional test-all test-coverage db-reset db-reset-test logs
+.PHONY: install start stop test test-unit test-functional test-all test-coverage cs cs-fix phpstan quality db-reset db-reset-test logs
 
 # Alias
 PHP = docker compose exec php
@@ -35,17 +35,35 @@ test-all: test-unit test-functional
 test-coverage:
 	$(PHP) sh -c "XDEBUG_MODE=coverage bin/phpunit --coverage-html coverage/"
 
-# Analyse statique + tests
+# Code style check
+cs:
+	$(PHP) vendor/bin/phpcs
+
+# Code style auto-fix
+cs-fix:
+	$(PHP) vendor/bin/phpcbf
+
+# Static analysis
+phpstan:
+	$(PHP) vendor/bin/phpstan analyse --memory-limit=256M
+
+# Quality: CS + PHPStan
+quality: cs phpstan
+	@echo "\n✅ Quality checks passed!"
+
+# Full test suite
 test:
-	@echo "→ Tests unitaires..."
+	@echo "→ Code style..."
+	$(PHP) vendor/bin/phpcs
+	@echo "\n→ Static analysis..."
+	$(PHP) vendor/bin/phpstan analyse --memory-limit=256M
+	@echo "\n→ Tests unitaires..."
 	$(PHPUNIT) tests/Unit/
 	@echo "\n→ Tests fonctionnels..."
 	$(CONSOLE) doctrine:database:drop --env=test --force --if-exists
 	$(CONSOLE) doctrine:database:create --env=test
 	$(CONSOLE) doctrine:migrations:migrate --env=test -n
 	$(PHPUNIT) tests/Functional/
-	@echo "\n→ Analyse statique..."
-	$(PHP) vendor/bin/phpstan analyse --memory-limit=256M
 
 # Reset DB dev
 db-reset:
