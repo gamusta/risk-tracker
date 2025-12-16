@@ -32,6 +32,11 @@ use Symfony\Component\Validator\Constraints as Assert;
         new Delete(
             processor: RiskProcessor::class
         ),
+        new \ApiPlatform\Metadata\Patch(
+            uriTemplate: '/risks/{id}/status',
+            processor: RiskProcessor::class,
+            denormalizationContext: ['groups' => ['risk:status']]
+        ),
     ],
     normalizationContext: ['groups' => ['risk:read']],
     denormalizationContext: ['groups' => ['risk:write']],
@@ -65,7 +70,7 @@ class RiskResource
     #[Assert\Range(min: 1, max: 5)]
     public int $probability;
 
-    #[Groups(['risk:read'])]
+    #[Groups(['risk:read', 'risk:status'])]
     public string $status;
 
     #[Groups(['risk:read'])]

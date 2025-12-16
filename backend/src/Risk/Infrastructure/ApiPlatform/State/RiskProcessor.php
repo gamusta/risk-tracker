@@ -10,7 +10,10 @@ use App\Risk\Application\Command\CreateRiskCommand;
 use App\Risk\Application\Command\CreateRiskHandler;
 use App\Risk\Application\Command\UpdateRiskCommand;
 use App\Risk\Application\Command\UpdateRiskHandler;
+use App\Risk\Application\Command\ChangeRiskStatusCommand;
+use App\Risk\Application\Command\ChangeRiskStatusHandler;
 use App\Risk\Domain\Repository\RiskRepositoryInterface;
+use App\Risk\Domain\ValueObject\RiskStatus;
 use App\Risk\Infrastructure\ApiPlatform\RiskResource;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -22,6 +25,7 @@ final readonly class RiskProcessor implements ProcessorInterface
     public function __construct(
         private CreateRiskHandler $createRiskHandler,
         private UpdateRiskHandler $updateRiskHandler,
+        private ChangeRiskStatusHandler $changeRiskStatusHandler,
         private RiskRepositoryInterface $riskRepository,
         private RiskProvider $riskProvider
     ) {
@@ -68,6 +72,17 @@ final readonly class RiskProcessor implements ProcessorInterface
 
             $risk = ($this->updateRiskHandler)($command);
             return $this->riskProvider->provide($operation, ['id' => $risk->getId()], $context);
+        }
+
+        // PATCH /risks/{id}/status (State Pattern)
+        if ($operation instanceof \ApiPlatform\Metadata\Patch) {
+            $command = new ChangeRiskStatusCommand(
+                riskId: $uriVariables['id'],
+                newStatus: RiskStatus::from($data->status)
+            );
+
+            ($this->changeRiskStatusHandler)($command);
+            return $this->riskProvider->provide($operation, ['id' => $uriVariables['id']], $context);
         }
 
         return null;
