@@ -14,7 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * Entité Domain: Risk (comportements métier)
- * ValueObjects stockés en primitives pour simplicité Doctrine
+ * ValueObjects embedded pour DDD pur
  */
 #[ORM\Entity(repositoryClass: 'App\Risk\Infrastructure\Persistence\DoctrineRiskRepository')]
 #[ORM\Table(name: 'risks')]
@@ -34,17 +34,17 @@ class Risk
     #[ORM\Column(type: 'string', length: 50)]
     private string $type;
 
-    #[ORM\Column(type: 'integer')]
-    private int $severity;
+    #[ORM\Embedded(class: Severity::class, columnPrefix: false)]
+    private Severity $severity;
 
-    #[ORM\Column(type: 'integer')]
-    private int $probability;
+    #[ORM\Embedded(class: Probability::class, columnPrefix: false)]
+    private Probability $probability;
 
     #[ORM\Column(type: 'string', length: 50)]
     private string $status;
 
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $score = null;
+    #[ORM\Embedded(class: RiskScore::class, columnPrefix: false)]
+    private ?RiskScore $score = null;
 
     #[ORM\Column(type: 'integer', nullable: true, name: 'site_id')]
     private ?int $siteId = null;
@@ -67,8 +67,8 @@ class Risk
     ) {
         $this->setTitle($title);
         $this->setType($type);
-        $this->severity = $severity->value();
-        $this->probability = $probability->value();
+        $this->severity = $severity;
+        $this->probability = $probability;
         $this->description = $description;
         $this->status = RiskStatus::DRAFT->value;
         $this->createdAt = new DateTimeImmutable();
@@ -108,8 +108,8 @@ class Risk
      */
     public function assess(Severity $severity, Probability $probability): void
     {
-        $this->severity = $severity->value();
-        $this->probability = $probability->value();
+        $this->severity = $severity;
+        $this->probability = $probability;
         $this->calculateScore();
         $this->updatedAt = new DateTimeImmutable();
     }
@@ -119,11 +119,7 @@ class Risk
      */
     private function calculateScore(): void
     {
-        $score = RiskScore::calculate(
-            Severity::fromInt($this->severity),
-            Probability::fromInt($this->probability)
-        );
-        $this->score = $score->value();
+        $this->score = RiskScore::calculate($this->severity, $this->probability);
     }
 
     /**
@@ -173,12 +169,12 @@ class Risk
 
     public function getSeverity(): Severity
     {
-        return Severity::fromInt($this->severity);
+        return $this->severity;
     }
 
     public function getProbability(): Probability
     {
-        return Probability::fromInt($this->probability);
+        return $this->probability;
     }
 
     public function getStatus(): RiskStatus
@@ -188,7 +184,7 @@ class Risk
 
     public function getScore(): ?RiskScore
     {
-        return $this->score ? RiskScore::fromInt($this->score) : null;
+        return $this->score;
     }
 
     public function getSiteId(): ?int

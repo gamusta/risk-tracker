@@ -12,7 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Embeddable]
 final class RiskScore
 {
-    #[ORM\Column(type: 'integer', name: 'score', nullable: true)]
+    #[ORM\Column(type: 'integer', nullable: true, name: 'score')]
     private int $value;
 
     public function __construct(?int $value = null)
