@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                  https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="App\Risk\Domain\Entity\Risk" table="risks" repository-class="App\Risk\Infrastructure\Persistence\DoctrineRiskRepository">
+        <id name="id" type="integer" column="id">
+            <generator strategy="IDENTITY"/>
+        </id>
+
+        <field name="title" type="string" length="255" nullable="false"/>
+        <field name="description" type="text" nullable="true"/>
+        <field name="type" type="string" length="50" nullable="false"/>
+        <field name="severity" type="integer" nullable="false"/>
+        <field name="probability" type="integer" nullable="false"/>
+        <field name="status" type="string" length="50" column="status" nullable="false"/>
+        <field name="score" type="integer" nullable="true"/>
+        <field name="siteId" type="integer" column="site_id" nullable="true"/>
+        <field name="assignedToId" type="integer" column="assigned_to_id" nullable="true"/>
+        <field name="createdAt" type="datetime_immutable" column="created_at"/>
+        <field name="updatedAt" type="datetime_immutable" column="updated_at"/>
+    </entity>
+
+</doctrine-mapping>
