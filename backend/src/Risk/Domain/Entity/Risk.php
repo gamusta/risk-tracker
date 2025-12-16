@@ -16,20 +16,46 @@ use Doctrine\ORM\Mapping as ORM;
  * Entité Domain: Risk (comportements métier)
  * ValueObjects stockés en primitives pour simplicité Doctrine
  */
+#[ORM\Entity(repositoryClass: 'App\Risk\Infrastructure\Persistence\DoctrineRiskRepository')]
+#[ORM\Table(name: 'risks')]
 class Risk
 {
+    #[ORM\Id]
+    #[ORM\GeneratedValue]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
+
+    #[ORM\Column(type: 'string', length: 255)]
     private string $title;
+
+    #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
+
+    #[ORM\Column(type: 'string', length: 50)]
     private string $type;
 
+    #[ORM\Column(type: 'integer')]
     private int $severity;
+
+    #[ORM\Column(type: 'integer')]
     private int $probability;
+
+    #[ORM\Column(type: 'string', length: 50)]
     private string $status;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $score = null;
+
+    #[ORM\Column(type: 'integer', nullable: true, name: 'site_id')]
     private ?int $siteId = null;
+
+    #[ORM\Column(type: 'integer', nullable: true, name: 'assigned_to_id')]
     private ?int $assignedToId = null;
+
+    #[ORM\Column(type: 'datetime_immutable', name: 'created_at')]
     private DateTimeImmutable $createdAt;
+
+    #[ORM\Column(type: 'datetime_immutable', name: 'updated_at')]
     private DateTimeImmutable $updatedAt;
 
     private function __construct(
