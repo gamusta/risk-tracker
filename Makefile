@@ -1,8 +1,14 @@
 .PHONY: install start stop test test-unit test-functional test-all test-coverage db-reset db-reset-test logs
 
+# Alias
+PHP = docker compose exec php
+CONSOLE = $(PHP) bin/console
+PHPUNIT = $(PHP) bin/phpunit
+COMPOSER = docker compose run --rm php composer
+
 install:
 	docker compose build
-	docker compose run --rm php composer install
+	$(COMPOSER) install
 	docker compose run --rm -w /frontend node:20-alpine npm install
 
 start:
@@ -13,49 +19,49 @@ stop:
 
 # Tests unitaires uniquement
 test-unit:
-	php bin/phpunit tests/Unit/
+	$(PHPUNIT) tests/Unit/
 
 # Tests fonctionnels uniquement
 test-functional:
-	php bin/console doctrine:database:drop --env=test --force --if-exists
-	php bin/console doctrine:database:create --env=test
-	php bin/console doctrine:migrations:migrate --env=test -n
-	php bin/phpunit tests/Functional/
+	$(CONSOLE) doctrine:database:drop --env=test --force --if-exists
+	$(CONSOLE) doctrine:database:create --env=test
+	$(CONSOLE) doctrine:migrations:migrate --env=test -n
+	$(PHPUNIT) tests/Functional/
 
 # Tous les tests
 test-all: test-unit test-functional
 
 # Tests avec coverage
 test-coverage:
-	XDEBUG_MODE=coverage php bin/phpunit --coverage-html coverage/
+	$(PHP) sh -c "XDEBUG_MODE=coverage bin/phpunit --coverage-html coverage/"
 
 # Analyse statique + tests
 test:
 	@echo "→ Tests unitaires..."
-	php bin/phpunit tests/Unit/
+	$(PHPUNIT) tests/Unit/
 	@echo "\n→ Tests fonctionnels..."
-	php bin/console doctrine:database:drop --env=test --force --if-exists
-	php bin/console doctrine:database:create --env=test
-	php bin/console doctrine:migrations:migrate --env=test -n
-	php bin/phpunit tests/Functional/
+	$(CONSOLE) doctrine:database:drop --env=test --force --if-exists
+	$(CONSOLE) doctrine:database:create --env=test
+	$(CONSOLE) doctrine:migrations:migrate --env=test -n
+	$(PHPUNIT) tests/Functional/
 	@echo "\n→ Analyse statique..."
-	php vendor/bin/phpstan analyse src --level=5
+	$(PHP) vendor/bin/phpstan analyse src --level=5
 
 # Reset DB dev
 db-reset:
-	php bin/console doctrine:database:drop --force --if-exists
-	php bin/console doctrine:database:create
-	php bin/console doctrine:migrations:migrate -n
+	$(CONSOLE) doctrine:database:drop --force --if-exists
+	$(CONSOLE) doctrine:database:create
+	$(CONSOLE) doctrine:migrations:migrate -n
 
 # Reset DB test
 db-reset-test:
-	php bin/console doctrine:database:drop --env=test --force --if-exists
-	php bin/console doctrine:database:create --env=test
-	php bin/console doctrine:migrations:migrate --env=test -n
+	$(CONSOLE) doctrine:database:drop --env=test --force --if-exists
+	$(CONSOLE) doctrine:database:create --env=test
+	$(CONSOLE) doctrine:migrations:migrate --env=test -n
 
-# Fixtures (si installées)
+# Fixtures
 db-fixtures:
-	php bin/console doctrine:fixtures:load -n
+	$(CONSOLE) doctrine:fixtures:load -n
 
 logs:
 	docker compose logs -f
